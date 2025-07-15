@@ -1,212 +1,249 @@
-import React from "react";
+import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function CategorySection() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showAllCards, setShowAllCards] = useState(false);
+
+  const slides = [
+    [
+      {
+        title: "Diamond Jewellery",
+        img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=600&fit=crop&crop=center",
+        alt: "Diamond Ring",
+        colSpan: 3,
+        rowSpan: 2,
+        textSize: "text-xl",
+        padding: "p-8",
+        bgColor: "bg-olive-800/80",
+      },
+      {
+        title: "Rings",
+        img: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop&crop=center",
+        alt: "Gold Ring",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Pendants",
+        img: "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=400&h=600&fit=crop&crop=center",
+        alt: "Gold Pendant",
+        colSpan: 3,
+        rowSpan: 2,
+        textSize: "text-xl",
+        padding: "p-8",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Bracelets",
+        img: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop&crop=center",
+        alt: "Gold Bracelet",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Silver",
+        img: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&crop=center",
+        alt: "Silver Jewelry",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Gold Jewellery",
+        img: "https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=400&h=300&fit=crop&crop=center",
+        alt: "Gold Jewelry",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-700/80",
+      },
+    ],
+    [
+      {
+        title: "Necklaces",
+        img: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&h=300&fit=crop&crop=center",
+        alt: "Gold Necklace",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Earrings",
+        img: "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=400&h=300&fit=crop&crop=center",
+        alt: "Gold Earrings",
+        colSpan: 3,
+        rowSpan: 2,
+        textSize: "text-xl",
+        padding: "p-8",
+        bgColor: "bg-olive-800/80",
+      },
+      {
+        title: "Coins",
+        img: "https://media.assettype.com/TNIE/import/2021/10/19/original/gold_coin.JPG?w=1200&h=675&auto=format%2Ccompress&fit=max&enlarge=true",
+        alt: "Gold Coins",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-700/80",
+      },
+      {
+        title: "Mangalsutras",
+        img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=300&fit=crop&crop=center",
+        alt: "Mangalasutra",
+        colSpan: 3,
+        rowSpan: 2,
+        textSize: "text-xl",
+        padding: "p-8",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Men's Bracelets",
+        img: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop&crop=center",
+        alt: "Men's Bracelet",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-600/80",
+      },
+      {
+        title: "Men's Chains",
+        img: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&h=300&fit=crop&crop=center",
+        alt: "Men's Chain",
+        colSpan: 3,
+        rowSpan: 1,
+        textSize: "text-base",
+        padding: "p-5",
+        bgColor: "bg-olive-700/80",
+      },
+    ],
+  ];
+
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  };
+
+  const allCards = slides.flat();
+  const visibleCards = showAllCards ? allCards : allCards.slice(0, 5);
+
   return (
-    <div className="bg-pink-50 py-16 px-4 relative">
+    <div className="bg-gradient-to-b from-beige-50/50 to-white py-20 px-6 relative">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-light text-gray-800 mb-8">
-            Category
-          </h1>
+       <div className="text-center mb-12">
+  <h1 className="text-4xl md:text-5xl font-light text-gray-800 mb-2">
+    Explore Our Collections
+  </h1>
+  <p className="text-gray-500 text-lg">Handpicked Styles for Every Taste</p>
+</div>
+
+
+        {/* Category Grid - Desktop */}
+        <div className="hidden md:grid grid-cols-12 gap-6 h-[600px]">
+          {slides[currentSlide].map((category, index) => (
+            <div
+              key={index}
+              className={`col-span-${category.colSpan} row-span-${category.rowSpan} relative group cursor-pointer`}
+            >
+              <div className="w-full h-full rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
+                <img
+                  src={category.img}
+                  alt={category.alt}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className={`absolute bottom-0 left-0 right-0 ${category.padding}`}>
+                  <div className={`${category.bgColor} bg-teal-700 rounded-xl px-4 py-2`}>
+                    <h3 className={`text-white ${category.textSize} font-semibold tracking-wide`}>
+                      {category.title}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Category Grid */}
-        <div className="grid grid-cols-12 gap-4 h-[600px]">
-          {/* Diamond Jewellery - Large left */}
-          <div className="col-span-3 row-span-2 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=600&fit=crop&crop=center"
-                alt="Diamond Ring"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="bg-gray-800/80 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-lg font-medium">
-                    Diamond Jewellery
-                  </h3>
+        {/* Category Grid - Mobile */}
+        <div className="md:hidden space-y-6">
+          {visibleCards.map((category, index) => (
+            <div
+              key={index}
+              className="relative group cursor-pointer"
+            >
+              <div className="w-full h-70 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
+                <img
+                  src={category.img}
+                  alt={category.alt}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <div className={`${category.bgColor} bg-teal-700 rounded-xl px-4 py-2`}>
+                    <h3 className="text-white text-lg font-semibold tracking-wide">
+                      {category.title}
+                    </h3>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
 
-          {/* Rings - Top right small */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop&crop=center"
-                alt="Gold Ring"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">Rings</h3>
-                </div>
-              </div>
+          {/* See More Button - Mobile */}
+          {!showAllCards && (
+            <div className="text-center pt-8">
+              <button
+                onClick={() => setShowAllCards(true)}
+                className="bg-teal-700 hover:bg-olive-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
+                See More
+              </button>
             </div>
-          </div>
+          )}
 
-          {/* Pendants - Medium center */}
-          <div className="col-span-3 row-span-2 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=400&h=600&fit=crop&crop=center"
-                alt="Gold Pendant"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-lg font-medium">Pendants</h3>
-                </div>
-              </div>
+          {/* Show Less Button - Mobile */}
+          {showAllCards && (
+            <div className="text-center pt-8">
+              <button
+                onClick={() => setShowAllCards(false)}
+                className="bg-teal-700 hover:bg-olive-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
+                Show Less
+              </button>
             </div>
-          </div>
-
-          {/* Bracelets - Small top right */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop&crop=center"
-                alt="Gold Bracelet"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">Bracelets</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Silver - Medium horizontal */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop&crop=center"
-                alt="Silver Jewelry"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">Silver</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Gold Jewellery - Top far right */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=400&h=300&fit=crop&crop=center"
-                alt="Gold Jewelry"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-yellow-500/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">
-                    Gold Jewellery
-                  </h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Earrings - Large bottom left */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=400&h=300&fit=crop&crop=center"
-                alt="Gold Earrings"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">Earrings</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Necklace - Bottom center */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&h=300&fit=crop&crop=center"
-                alt="Gold Necklace"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">Necklace</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mangalasutra - Bottom center-right */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=300&fit=crop&crop=center"
-                alt="Mangalasutra"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-pink-400/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">
-                    Mangalasutra
-                  </h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Coins - Small bottom right */}
-          <div className="col-span-3 row-span-1 relative group cursor-pointer">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1610375461369-d613b564f04c?w=400&h=300&fit=crop&crop=center"
-                alt="Gold Coins"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="bg-orange-500/90 backdrop-blur-sm rounded-xl px-4 py-2">
-                  <h3 className="text-white text-sm font-medium">Coins</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Jewellery with Gemstone - Far right */}
+          )}
         </div>
 
-        {/* Navigation Arrows */}
-        <button className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all group">
-          <ChevronLeft className="w-6 h-6 text-gray-600 group-hover:text-gray-800" />
+        {/* Navigation Arrows - Desktop only */}
+        <button
+          onClick={handlePrev}
+          className="hidden md:flex absolute left-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-beige-100/80 backdrop-blur-sm rounded-full shadow-lg items-center justify-center hover:bg-teal-700 hover:shadow-xl transition-all duration-300 group"
+        >
+          <ChevronLeft className="w-7 h-7 text-olive-800 group-hover:text-white" />
         </button>
 
-        <button className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all group">
-          <ChevronRight className="w-6 h-6 text-gray-600 group-hover:text-gray-800" />
+        <button
+          onClick={handleNext}
+          className="hidden md:flex absolute right-6 top-1/2 transform -translate-y-1/2 w-14 h-14 bg-beige-100/80 backdrop-blur-sm rounded-full shadow-lg items-center justify-center hover:bg-teal-700 hover:shadow-xl transition-all duration-300 group"
+        >
+          <ChevronRight className="w-7 h-7 text-olive-800 group-hover:text-white" />
         </button>
-      </div>
 
-      {/* Windows Activation Notice */}
-      <div className="fixed bottom-4 right-4 text-gray-400 text-sm">
-        <p>Activate Windows</p>
-        <p>Go to Settings to activate Windows.</p>
       </div>
     </div>
   );
