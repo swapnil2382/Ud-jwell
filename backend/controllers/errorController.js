@@ -12,8 +12,7 @@ const globalErrorHandler = (err, req, res, next) => {
 
   //All fields of the app that have unique:true property
   if (err.code === 11000) {
-    const field =
-      err.keyValue.email || err.keyValue.title || err.keyValue.categoryName;
+    const field = err.keyValue.email;
     err = new AppError(`Duplicate field value: ${field}`, 400);
   }
 
