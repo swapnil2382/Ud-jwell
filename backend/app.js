@@ -7,6 +7,7 @@ const globalErrorHandler = require("./controllers/errorController");
 
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
+const jewelleryRouter = require("./routes/jewelleryRoutes");
 
 const corsOptions = {
   origin: " http://localhost:5173",
@@ -24,6 +25,7 @@ app.use(cookieParser());
 //ROUTES
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter); //for only admins
+app.use("/api/v1/jewellery", jewelleryRouter);
 
 //CUSTOM ERROR MESSAGE FOR UNHANDLED ROUTES
 app.all("*", (req, res, next) => {

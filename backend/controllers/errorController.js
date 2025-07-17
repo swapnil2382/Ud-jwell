@@ -6,7 +6,7 @@ const globalErrorHandler = (err, req, res, next) => {
 
   //Invalid MongoDB ID error / Query string error
   if (err.name === "CastError") {
-    const message = `Invalid ${err.path}: ${err.value}`;
+    const message = `Invalid data for ${err.path}: ${err.value}`;
     err = new AppError(message, 400);
   }
 
