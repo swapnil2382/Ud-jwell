@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ProductListing = () => {
   const [jewelleryItems, setJewelleryItems] = useState([]);
@@ -7,27 +7,32 @@ const ProductListing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    category: '',
-    metal: '',
-    gender: '',
-    occasion: '',
-    purity: '',
+    category: "",
+    metal: "",
+    gender: "",
+    occasion: "",
+    purity: "",
   });
-  const [sortBy, setSortBy] = useState('');
+  const [sortBy, setSortBy] = useState("");
 
-  // Fetch jewellery items from API
+  // Fetch jewellery items from APIuiy
   useEffect(() => {
     const fetchJewellery = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:8000/api/v1/jewellery', {
-          withCredentials: true
-        });
+        const response = await axios.get(
+          "http://localhost:8000/api/v1/jewellery",
+          {
+            withCredentials: true,
+          }
+        );
         setJewelleryItems(response.data.data);
         setFilteredItems(response.data.data);
         setLoading(false);
       } catch (err) {
-        setError(`Failed to fetch jewellery items: ${err.message} (Status: ${err.response?.status})`);
+        setError(
+          `Failed to fetch jewellery items: ${err.message} (Status: ${err.response?.status})`
+        );
         setLoading(false);
       }
     };
@@ -62,9 +67,9 @@ const ProductListing = () => {
     }
 
     // Apply sorting
-    if (sortBy === 'name-asc') {
+    if (sortBy === "name-asc") {
       result.sort((a, b) => a.prodname.localeCompare(b.prodname));
-    } else if (sortBy === 'name-desc') {
+    } else if (sortBy === "name-desc") {
       result.sort((a, b) => b.prodname.localeCompare(a.prodname));
     }
 
@@ -74,22 +79,23 @@ const ProductListing = () => {
   // Reset filters
   const resetFilters = () => {
     setFilters({
-      category: '',
-      metal: '',
-      gender: '',
-      occasion: '',
-      purity: '',
+      category: "",
+      metal: "",
+      gender: "",
+      occasion: "",
+      purity: "",
     });
-    setSortBy('');
+    setSortBy("");
   };
 
   if (loading) return <div className="text-center py-10">Loading...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
+  if (error)
+    return <div className="text-center py-10 text-red-500">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Jewellery Collection</h1>
-      
+
       {/* Filter and Sort Section */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="flex-1">
@@ -193,20 +199,25 @@ const ProductListing = () => {
             className="border rounded-lg p-4 shadow hover:shadow-lg transition"
           >
             <img
-              src={item.images[0] || 'https://via.placeholder.com/150?text=No+Image'}
+              src={
+                item.images[0] ||
+                "https://via.placeholder.com/150?text=No+Image"
+              }
               alt={item.prodname}
               className="w-full h-48 object-cover rounded mb-4"
             />
             <h3 className="text-lg font-semibold">{item.prodname}</h3>
             <p className="text-gray-600 capitalize">{item.category}</p>
-            <p className="text-gray-600">{item.metal} ({item.purity})</p>
+            <p className="text-gray-600">
+              {item.metal} ({item.purity})
+            </p>
             <p className="text-gray-600">For: {item.gender}</p>
             <p className="text-gray-600">Occasion: {item.occasion}</p>
             <p className="text-sm text-gray-500 mt-2">
               {item.description.substring(0, 100)}...
             </p>
             <p className="text-green-600 font-semibold mt-2">
-              {item.available ? 'In Stock' : 'Out of Stock'}
+              {item.available ? "In Stock" : "Out of Stock"}
             </p>
           </div>
         ))}
