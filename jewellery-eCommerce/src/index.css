@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-first: #000;
+  --color-second: #2abfff;
+  --color-third: #0071ff;
+  --color-fourth: #364153;
+}
+
+/* #72042f */
+/* #e3707b */
+/* #edb4b2 */
+/* #752d4b */
+/* #401e1d */
+/* #4c2b20 */
+/* #626c53 */
+/* #044c58 */
+/* #2c5a54 */
+/* #300708 */
+/* #81d8d0 Tiffany */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
