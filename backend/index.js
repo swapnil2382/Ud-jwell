@@ -4,7 +4,7 @@ const { connectDB } = require("./db/db");
 
 const port = process.env.PORT || 3000;
 
-//DATABASE & SERVER CONNECTION
+// DATABASE & SERVER CONNECTION
 connectDB()
   .then(() => {
     app.listen(port, () => {
@@ -12,5 +12,6 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log("Error", err);
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
   });
