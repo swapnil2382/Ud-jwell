@@ -121,6 +121,6 @@ const jewellerySchema = new mongoose.Schema(
   }
 );
 
-const Jewellery = mongoose.model("Jewelry", jewellerySchema);
+const Jewellery = mongoose.model("Jewellery", jewellerySchema);
 
 module.exports = Jewellery;
