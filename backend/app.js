@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const AppError = require("./utils/appArror");
 const globalErrorHandler = require("./controllers/errorController");
@@ -21,6 +22,7 @@ app.use(
     credentials: true,
   })
 );
+app.use("/assets", express.static(path.join(__dirname, "assets")));
 app.use(express.json({ limit: "4Mb" }));
 app.use(cookieParser());
 

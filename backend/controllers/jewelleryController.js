@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 const Jewellery = require("../models/jewelleryModel");
 const AppError = require("../utils/appArror");
 
@@ -39,7 +42,78 @@ const getJewellery = async (req, res, next) => {
 };
 
 // Create a new jewellery item
+// const createJewellery = async (req, res, next) => {
+//   try {
+//     const {
+//       prodname,
+//       category,
+//       description,
+//       weights,
+//       metal,
+//       metalColour,
+//       gender,
+//       occasion,
+//       purity,
+//       filterLists,
+//       images, // base64 strings
+//       customizable,
+//       materialDescription,
+//     } = req.body;
+
+//     const imageUrls = [];
+
+//     // Create the assets folder if it doesn't exist
+//     const assetsPath = path.join(__dirname, "..", "assets");
+//     if (!fs.existsSync(assetsPath)) {
+//       fs.mkdirSync(assetsPath);
+//     }
+
+//     // Process each base64 image
+//     images.forEach((base64String) => {
+//       const matches = base64String.match(/^data:(image\/\w+);base64,(.+)$/);
+//       if (!matches) return;
+
+//       const mimeType = matches[1];
+//       const base64Data = matches[2];
+//       const extension = mimeType.split("/")[1];
+//       const filename = `${uuidv4()}.${extension}`;
+//       const filepath = path.join(assetsPath, filename);
+
+//       fs.writeFileSync(filepath, Buffer.from(base64Data, "base64"));
+//       const imageUrl = `${req.protocol}://${req.get("host")}/assets/${filename}`;
+//       imageUrls.push(imageUrl);
+//     });
+
+//     // Create the jewellery document
+//     const newJewellery = await Jewellery.create({
+//       prodname,
+//       category,
+//       description,
+//       weights,
+//       metal,
+//       metalColour,
+//       gender,
+//       occasion,
+//       purity,
+//       filterLists,
+//       images: imageUrls,
+//       customizable: customizable === "true",
+//       materialDescription,
+//     });
+
+//     res.status(201).json({
+//       status: "success",
+//       message: "Jewellery item created successfully",
+//       data: newJewellery,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
 const createJewellery = async (req, res, next) => {
+  const savedFilenames = []; // Track saved image files
+
   try {
     const {
       prodname,
@@ -52,11 +126,37 @@ const createJewellery = async (req, res, next) => {
       occasion,
       purity,
       filterLists,
-      images,
+      images, // base64 strings
       customizable,
       materialDescription,
     } = req.body;
 
+    const imageUrls = [];
+
+    // Ensure the assets folder exists
+    const assetsPath = path.join(__dirname, "..", "assets");
+    if (!fs.existsSync(assetsPath)) {
+      fs.mkdirSync(assetsPath);
+    }
+
+    // Process and store base64 images
+    images.forEach((base64String) => {
+      const matches = base64String.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (!matches) return;
+
+      const mimeType = matches[1];
+      const base64Data = matches[2];
+      const extension = mimeType.split("/")[1];
+      const filename = `${uuidv4()}.${extension}`;
+      const filepath = path.join(assetsPath, filename);
+
+      fs.writeFileSync(filepath, Buffer.from(base64Data, "base64"));
+      savedFilenames.push(filename); // Track filename for cleanup
+      const imageUrl = `${req.protocol}://${req.get("host")}/assets/${filename}`;
+      imageUrls.push(imageUrl);
+    });
+
+    // Create product in DB
     const newJewellery = await Jewellery.create({
       prodname,
       category,
@@ -68,17 +168,27 @@ const createJewellery = async (req, res, next) => {
       occasion,
       purity,
       filterLists,
-      images,
-      customizable,
+      images: imageUrls,
+      customizable: customizable === "true",
       materialDescription,
     });
 
+    // Send success response
     res.status(201).json({
       status: "success",
       message: "Jewellery item created successfully",
       data: newJewellery,
     });
   } catch (err) {
+    // Delete saved images if creation failed
+    const assetsPath = path.join(__dirname, "..", "assets");
+    savedFilenames.forEach((filename) => {
+      const filepath = path.join(assetsPath, filename);
+      if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+    });
+
     next(err);
   }
 };
