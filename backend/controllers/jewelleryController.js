@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const { v4: uuidv4 } = require("uuid");
+// const { v4: uuidv4 } = require("uuid");
+const slugify = require("slugify");
 const Jewellery = require("../models/jewelleryModel");
 const AppError = require("../utils/appArror");
 
@@ -42,77 +43,14 @@ const getJewellery = async (req, res, next) => {
 };
 
 // Create a new jewellery item
-// const createJewellery = async (req, res, next) => {
-//   try {
-//     const {
-//       prodname,
-//       category,
-//       description,
-//       weights,
-//       metal,
-//       metalColour,
-//       gender,
-//       occasion,
-//       purity,
-//       filterLists,
-//       images, // base64 strings
-//       customizable,
-//       materialDescription,
-//     } = req.body;
-
-//     const imageUrls = [];
-
-//     // Create the assets folder if it doesn't exist
-//     const assetsPath = path.join(__dirname, "..", "assets");
-//     if (!fs.existsSync(assetsPath)) {
-//       fs.mkdirSync(assetsPath);
-//     }
-
-//     // Process each base64 image
-//     images.forEach((base64String) => {
-//       const matches = base64String.match(/^data:(image\/\w+);base64,(.+)$/);
-//       if (!matches) return;
-
-//       const mimeType = matches[1];
-//       const base64Data = matches[2];
-//       const extension = mimeType.split("/")[1];
-//       const filename = `${uuidv4()}.${extension}`;
-//       const filepath = path.join(assetsPath, filename);
-
-//       fs.writeFileSync(filepath, Buffer.from(base64Data, "base64"));
-//       const imageUrl = `${req.protocol}://${req.get("host")}/assets/${filename}`;
-//       imageUrls.push(imageUrl);
-//     });
-
-//     // Create the jewellery document
-//     const newJewellery = await Jewellery.create({
-//       prodname,
-//       category,
-//       description,
-//       weights,
-//       metal,
-//       metalColour,
-//       gender,
-//       occasion,
-//       purity,
-//       filterLists,
-//       images: imageUrls,
-//       customizable: customizable === "true",
-//       materialDescription,
-//     });
-
-//     res.status(201).json({
-//       status: "success",
-//       message: "Jewellery item created successfully",
-//       data: newJewellery,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+function ensureFolderExists(folderPath) {
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+}
 
 const createJewellery = async (req, res, next) => {
-  const savedFilenames = []; // Track saved image files
+  const savedFiles = [];
 
   try {
     const {
@@ -126,38 +64,15 @@ const createJewellery = async (req, res, next) => {
       occasion,
       purity,
       filterLists,
-      images, // base64 strings
+      images,
       customizable,
       materialDescription,
     } = req.body;
 
-    const imageUrls = [];
+    const productSlug = slugify(prodname, { lower: true, strict: true });
 
-    // Ensure the assets folder exists
-    const assetsPath = path.join(__dirname, "..", "assets");
-    if (!fs.existsSync(assetsPath)) {
-      fs.mkdirSync(assetsPath);
-    }
-
-    // Process and store base64 images
-    images.forEach((base64String) => {
-      const matches = base64String.match(/^data:(image\/\w+);base64,(.+)$/);
-      if (!matches) return;
-
-      const mimeType = matches[1];
-      const base64Data = matches[2];
-      const extension = mimeType.split("/")[1];
-      const filename = `${uuidv4()}.${extension}`;
-      const filepath = path.join(assetsPath, filename);
-
-      fs.writeFileSync(filepath, Buffer.from(base64Data, "base64"));
-      savedFilenames.push(filename); // Track filename for cleanup
-      const imageUrl = `${req.protocol}://${req.get("host")}/assets/${filename}`;
-      imageUrls.push(imageUrl);
-    });
-
-    // Create product in DB
-    const newJewellery = await Jewellery.create({
+    // Create the product instance and save it to generate _id
+    const newJewellery = new Jewellery({
       prodname,
       category,
       description,
@@ -168,27 +83,54 @@ const createJewellery = async (req, res, next) => {
       occasion,
       purity,
       filterLists,
-      images: imageUrls,
-      customizable: customizable === "true",
+      customizable,
       materialDescription,
+      images: [],
     });
 
-    // Send success response
+    await newJewellery.save();
+    const productId = newJewellery._id.toString();
+
+    // Ensure product image folder exists
+    const assetsDir = path.join(__dirname, "..", "assets", "product");
+    ensureFolderExists(assetsDir);
+
+    const imageUrls = [];
+
+    images.forEach((base64String, index) => {
+      const matches = base64String.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (!matches) return;
+
+      const mimeType = matches[1];
+      const base64Data = matches[2];
+      const extension = mimeType.split("/")[1];
+
+      const fileName = `${productId}_${productSlug}_${index + 1}.${extension}`;
+      const filePath = path.join(assetsDir, fileName);
+
+      fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
+      savedFiles.push(filePath);
+
+      const imageUrl = `${req.protocol}://${req.get("host")}/assets/product/${fileName}`;
+      imageUrls.push(imageUrl);
+    });
+
+    // Update product with image URLs
+    newJewellery.images = imageUrls;
+    await newJewellery.save(); // Save updated images array
+
     res.status(201).json({
       status: "success",
       message: "Jewellery item created successfully",
       data: newJewellery,
     });
   } catch (err) {
-    // Delete saved images if creation failed
-    const assetsPath = path.join(__dirname, "..", "assets");
-    savedFilenames.forEach((filename) => {
-      const filepath = path.join(assetsPath, filename);
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
+    // Cleanup saved image files
+    savedFiles.forEach((filePath) => {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
       }
     });
-
     next(err);
   }
 };
@@ -219,11 +161,34 @@ const updateJewellery = async (req, res, next) => {
 // Delete a jewellery item by ID
 const deleteJewellery = async (req, res, next) => {
   try {
-    const jewellery = await Jewellery.findByIdAndDelete(req.params.jewelleryId);
+    const { jewelleryId } = req.params;
+
+    const jewellery = await Jewellery.findById(jewelleryId);
 
     if (!jewellery) {
       return next(new AppError("No jewellery item found with that ID", 404));
     }
+
+    // Remove associated image files
+    if (jewellery.images && jewellery.images.length > 0) {
+      jewellery.images.forEach((imgUrl) => {
+        const filename = imgUrl.split("/assets/product/")[1];
+        if (filename) {
+          const filepath = path.join(
+            __dirname,
+            "..",
+            "assets",
+            "product",
+            filename
+          );
+          if (fs.existsSync(filepath)) {
+            fs.unlinkSync(filepath);
+          }
+        }
+      });
+    }
+    // Delete from DB
+    await Jewellery.findByIdAndDelete(req.params.jewelleryId);
 
     res.status(200).json({
       status: "success",
