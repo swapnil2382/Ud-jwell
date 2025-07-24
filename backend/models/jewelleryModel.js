@@ -55,7 +55,7 @@ const jewellerySchema = new mongoose.Schema(
     purity: {
       type: String,
       required: [true, "purity is required"],
-      enum: ["24", "22", "18", "14", "10", "925", "999"],
+      enum: ["24k", "22k", "18k", "14k", "10k", "925silver", "999silver"],
     },
     filterLists: {
       type: [String], // This means it's a list/array of strings

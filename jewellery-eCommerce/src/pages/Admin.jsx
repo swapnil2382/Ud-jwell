@@ -62,7 +62,15 @@ const Admin = ({ user }) => {
   const metalOptions = ["gold", "silver"];
   const genderOptions = ["men", "women", "kids", "unisex"];
   const occasionOptions = ["casual", "engagement", "wedding"];
-  const purityOptions = ["24", "22", "18", "14", "10", "925", "999"];
+  const purityOptions = [
+    "24k",
+    "22k",
+    "18k",
+    "14k",
+    "10k",
+    "925silver",
+    "999silver",
+  ];
   const metalColourOptions = ["yellow", "white", "rose"];
 
   // Clear messages after 5 seconds
@@ -165,46 +173,6 @@ const Admin = ({ user }) => {
   };
 
   // Handle form submission to add a new product
-  // const handleAddProduct = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     setLoading(true);
-  //     const response = await fetch(`${API_BASE_URL}/jewellery`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       credentials: "include",
-  //       body: JSON.stringify({
-  //         ...formData,
-  //         images: formData.image ? [formData.image] : [],
-  //         filterLists: [
-  //           formData.metal,
-  //           formData.gender,
-  //           formData.occasion,
-  //           formData.category,
-  //           formData.purity,
-  //           formData.metalColour,
-  //         ].filter(Boolean),
-  //       }),
-  //     });
-
-  //     if (!response.ok) throw new Error("Failed to add product");
-
-  //     const data = await response.json();
-  //     setProducts([...products, data.data]);
-  //     setSuccess("Product added successfully!");
-  //     setError(null);
-  //     setFormData(initialState);
-  //   } catch (err) {
-  //     setError(err.message || "Failed to add product.");
-  //     console.log(err);
-  //     setSuccess(null);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleAddProduct = async (e) => {
     e.preventDefault();
     try {

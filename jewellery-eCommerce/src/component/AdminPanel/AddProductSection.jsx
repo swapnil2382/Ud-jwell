@@ -251,33 +251,6 @@ export default function AddProductSection({
             />
           </div>
 
-          {/* Filter Lists */}
-          {/* <div className="lg:col-span-2">
-            <label
-              htmlFor="filterLists"
-              className="block text-sm font-semibold text-slate-700 mb-2"
-            >
-              Filter Tags (comma separated)
-            </label>
-            <input
-              type="text"
-              id="filterLists"
-              name="filterLists"
-              value={formData.filterLists.join(",")}
-              onChange={(e) =>
-                handleInputChange({
-                  target: {
-                    name: "filterLists",
-                    value: e.target.value.split(",").map((tag) => tag.trim()),
-                  },
-                })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white/50"
-              disabled={loading}
-              placeholder="e.g. lightweight, modern, bridal"
-            />
-          </div> */}
-
           {/* Image URLs */}
           <div className="lg:col-span-2">
             <label
@@ -286,24 +259,6 @@ export default function AddProductSection({
             >
               Image URLs (comma separated) *
             </label>
-            {/* <input
-              type="text"
-              id="images"
-              name="images"
-              value={formData.images.join(",")}
-              onChange={(e) =>
-                handleInputChange({
-                  target: {
-                    name: "images",
-                    value: e.target.value.split(",").map((url) => url.trim()),
-                  },
-                })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white/50"
-              required
-              disabled={loading}
-              placeholder="https://img1.jpg, https://img2.jpg"
-            /> */}
             <input
               type="file"
               // required
