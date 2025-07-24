@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { MapPin, Heart, ChevronDown, Menu, X, User, Package } from 'lucide-react';
+import { MapPin, Heart, ChevronDown, Menu, X, User, Package, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -135,7 +135,7 @@ const Navbar = () => {
             <Heart className="h-6 w-6" />
             <span className="text-base font-semibold">Wishlist</span>
           </button>
- <button className="flex items-center space-x-2 hover:text-yellow-400 transition-all duration-200">
+          <button className="flex items-center space-x-2 hover:text-yellow-400 transition-all duration-200">
             <MapPin className="h-6 w-6" />
             <span className="text-base font-semibold">Find a Store</span>
           </button>
@@ -155,6 +155,7 @@ const Navbar = () => {
                 )}
               </button>
               <button onClick={handleLogout} className="text-base font-semibold hover:text-yellow-400 transition-all duration-200">
+                <LogOut className="h-6 w-6 inline-block m-2" />
                 Logout
               </button>
             </>
@@ -164,7 +165,7 @@ const Navbar = () => {
               <a href="/signup" className="text-base font-semibold hover:text-yellow-400 transition-all duration-200">Signup</a>
             </>
           )}
-          
+
         </div>
 
         <div className="md:hidden">
@@ -223,23 +224,29 @@ const Navbar = () => {
             </button>
 
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex justify-between items-center w-full">
                 <button
                   onClick={handleProfileClick}
-                  className="flex items-center space-x-2 text-teal-100 hover:text-yellow-400 transition-all duration-200"
+                  className="flex items-center gap-1 text-teal-100 hover:text-yellow-400 transition-all duration-200"
                 >
-                  <User className="w-6 h-6" />
-                  <span>{user.fullname}</span>
+                  <User className="w-5 h-5" />
+                  <span className="text-sm">{user.fullname}</span>
                   {userRole && (
-                    <span className="text-xs bg-yellow-600 px-2 py-1 rounded-full">
+                    <span className="text-[10px] bg-yellow-600 px-2 py-0.5 rounded-full">
                       {userRole}
                     </span>
                   )}
                 </button>
-                <button onClick={handleLogout} className="text-teal-100 hover:text-yellow-400 transition-all duration-200">
-                  Logout
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1 text-teal-100 hover:text-yellow-400 transition-all duration-200"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span className="text-sm">Logout</span>
                 </button>
               </div>
+
             ) : (
               <>
                 <a href="/login" className="block text-teal-100 hover:text-yellow-400 transition-all duration-200">Login</a>

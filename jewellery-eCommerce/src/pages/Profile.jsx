@@ -133,59 +133,10 @@ function Profile({ user, setUser }) {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${API_BASE_URL}/auth/logout`, { withCredentials: true });
-      localStorage.removeItem('user');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('isLoggedIn');
-      setUser(null);
-      window.dispatchEvent(new Event('authChange'));
-      navigate('/');
-    } catch (err) {
-      console.error('Logout failed:', err);
-      localStorage.removeItem('user');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('isLoggedIn');
-      setUser(null);
-      window.dispatchEvent(new Event('authChange'));
-      navigate('/');
-    }
-  };
-
-  const handleWishlist = () => {
-    console.log('Wishlist clicked');
-  };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header Navigation */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <User className="w-6 h-6 text-blue-600" />
-              <h1 className="text-xl font-semibold text-gray-900">Your Profile</h1>
-            </div>
-            <nav className="flex items-center space-x-4">
-              <button
-                onClick={handleWishlist}
-                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-md"
-              >
-                <Heart className="w-4 h-4" />
-                <span className="text-sm font-medium">Wishlist</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-red-600 hover:bg-gray-50 rounded-md"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="text-sm font-medium">Logout</span>
-              </button>
-            </nav>
-          </div>
-        </div>
-      </header>
+     
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -125,4 +125,31 @@ const logOut = (req, res) => {
   });
 };
 
-module.exports = { signUp, logIn, logOut, protect, restrictTo };
+const getMe = async (req, res, next) => {
+  try {
+    let token = req.cookies[process.env.JWT_COOKIE_NAME];
+
+    if (!token) {
+      return next(new AppError("Please log in to get access.", 401));
+    }
+
+    const payload = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(payload.id).select('fullname email phone');
+
+    if (!user) {
+      return next(new AppError("User doesn't exist.", 404));
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: user
+    });
+
+  } catch (err) {
+    console.error('Error in getMe:', err);
+    next(err);
+  }
+};
+
+module.exports = { signUp, logIn, logOut, protect, restrictTo, getMe };

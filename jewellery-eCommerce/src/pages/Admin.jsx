@@ -25,6 +25,7 @@ const initialState = {
   customizable: "",
   materialDescription: "",
 };
+
 const Admin = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -46,7 +47,6 @@ const Admin = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [loading, setLoading] = useState(false);
-  console.log(formData);
 
   // Dropdown options based on Mongoose schema
   const categoryOptions = [
@@ -93,6 +93,7 @@ const Admin = ({ user }) => {
           credentials: "include",
         });
         const data = await response.json();
+        if (data.status !== "success") throw new Error(data.message || "Failed to fetch products");
         setProducts(data.data || []);
         setFilteredProducts(data.data || []);
       } catch (err) {
@@ -113,6 +114,7 @@ const Admin = ({ user }) => {
           credentials: "include",
         });
         const data = await response.json();
+        if (data.status !== "success") throw new Error(data.message || "Failed to fetch customers");
         setCustomers(data.data || []);
         setFilteredCustomers(data.data || []);
       } catch (err) {
@@ -180,7 +182,6 @@ const Admin = ({ user }) => {
 
       const productData = {
         ...formData,
-        // images: formData.image ? [formData.image] : [],
         filterLists: [
           formData.metal,
           formData.gender,
@@ -203,6 +204,7 @@ const Admin = ({ user }) => {
       );
 
       const data = response.data;
+      if (data.status !== "success") throw new Error(data.message || "Failed to add product");
 
       setProducts([...products, data.data]);
       setSuccess("Product added successfully!");
@@ -212,7 +214,6 @@ const Admin = ({ user }) => {
       setError(
         err.response?.data?.message || err.message || "Failed to add product."
       );
-      console.error(err);
       setSuccess(null);
     } finally {
       setLoading(false);
@@ -238,6 +239,39 @@ const Admin = ({ user }) => {
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to delete product.");
+      setSuccess(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle product editing
+  const handleEditProduct = async (jewelleryId, updatedData) => {
+    try {
+      setLoading(true);
+      const response = await axios.patch(
+        `${API_BASE_URL}/jewellery/${jewelleryId}`,
+        updatedData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      const data = response.data;
+      if (data.status !== "success") throw new Error(data.message || "Failed to update product");
+
+      setProducts(products.map((product) =>
+        product._id === jewelleryId ? data.data : product
+      ));
+      setSuccess("Product updated successfully!");
+      setError(null);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "Failed to update product."
+      );
       setSuccess(null);
     } finally {
       setLoading(false);
@@ -405,19 +439,25 @@ const Admin = ({ user }) => {
             metalColourOptions={metalColourOptions}
           />
         )}
-        {activeSection === "manage" && (
-          <ManageProductsSection
-            filteredProducts={filteredProducts}
-            loading={loading}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            filterCategory={filterCategory}
-            setFilterCategory={setFilterCategory}
-            handleDeleteProduct={handleDeleteProduct}
-            categoryOptions={categoryOptions}
-            metalOptions={metalOptions}
-          />
-        )}
+
+{activeSection === "manage" && (
+  <ManageProductsSection
+    filteredProducts={filteredProducts}
+    loading={loading}
+    searchTerm={searchTerm}
+    setSearchTerm={setSearchTerm}
+    filterCategory={filterCategory}
+    setFilterCategory={setFilterCategory}
+    handleDeleteProduct={handleDeleteProduct}
+    handleEditProduct={handleEditProduct}
+    categoryOptions={categoryOptions}
+    metalOptions={metalOptions}
+    genderOptions={genderOptions}
+    occasionOptions={occasionOptions}
+    purityOptions={purityOptions}
+    metalColourOptions={metalColourOptions}
+  />
+)}
         {activeSection === "customers" && (
           <ManageCustomersSection
             filteredCustomers={filteredCustomers}

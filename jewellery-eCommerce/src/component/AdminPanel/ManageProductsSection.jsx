@@ -1,16 +1,46 @@
-import { Package, Search, Filter, Trash2 } from 'lucide-react';
+import { Package, Search, Filter, Trash2, Edit2 } from 'lucide-react';
+import { useState } from 'react';
+import EditProductModal from './EditProductModal';
 
-export default function ManageProductsSection({ filteredProducts, loading, searchTerm, setSearchTerm, filterCategory, setFilterCategory, handleDeleteProduct, categoryOptions, metalOptions }) {
+export default function ManageProductsSection({ 
+  filteredProducts, 
+  loading, 
+  searchTerm, 
+  setSearchTerm, 
+  filterCategory, 
+  setFilterCategory, 
+  handleDeleteProduct, 
+  handleEditProduct, 
+  categoryOptions, 
+  metalOptions,
+  genderOptions,
+  occasionOptions,
+  purityOptions,
+  metalColourOptions
+}) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const openEditModal = (product) => {
+    setSelectedProduct(product);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedProduct(null);
+  };
+
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200 p-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200 p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center">
-            <Package className="w-8 h-8 text-white" />
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center">
+            <Package className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">Manage Products</h2>
-            <p className="text-slate-600">{filteredProducts.length} products found</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Manage Products</h2>
+            <p className="text-slate-600 text-sm sm:text-base">{filteredProducts.length} products found</p>
           </div>
         </div>
 
@@ -22,7 +52,7 @@ export default function ManageProductsSection({ filteredProducts, loading, searc
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+              className="pl-10 pr-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 w-full sm:w-auto"
             />
           </div>
           <div className="relative">
@@ -30,7 +60,7 @@ export default function ManageProductsSection({ filteredProducts, loading, searc
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="pl-10 pr-8 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 appearance-none"
+              className="pl-10 pr-8 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 appearance-none w-full sm:w-auto"
             >
               <option value="">All Categories</option>
               {categoryOptions.map(option => (
@@ -98,7 +128,14 @@ export default function ManageProductsSection({ filteredProducts, loading, searc
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                       {product.purity}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
+                      <button
+                        onClick={() => openEditModal(product)}
+                        disabled={loading}
+                        className="text-blue-600 hover:text-blue-900 disabled:opacity-50 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        <Edit2 size={16} />
+                      </button>
                       <button
                         onClick={() => handleDeleteProduct(product._id)}
                         disabled={loading}
@@ -113,6 +150,20 @@ export default function ManageProductsSection({ filteredProducts, loading, searc
             </table>
           </div>
         </div>
+      )}
+
+      {isEditModalOpen && selectedProduct && (
+        <EditProductModal
+          product={selectedProduct}
+          onClose={closeEditModal}
+          onSave={handleEditProduct}
+          categoryOptions={categoryOptions}
+          metalOptions={metalOptions}
+          genderOptions={genderOptions}
+          occasionOptions={occasionOptions}
+          purityOptions={purityOptions}
+          metalColourOptions={metalColourOptions}
+        />
       )}
     </div>
   );
