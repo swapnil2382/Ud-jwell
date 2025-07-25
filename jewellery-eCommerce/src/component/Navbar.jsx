@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { MapPin, Heart, ChevronDown, Menu, X, User, Package, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -15,6 +14,7 @@ const Navbar = () => {
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [prevScrollPos, setPrevScrollPos] = useState(0);
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const categories = [
     { name: "Gold", subcategories: ["Gold Chains", "Gold Rings", "Gold Necklaces", "Gold Bangles"] },
@@ -105,6 +105,57 @@ const Navbar = () => {
     }
   };
 
+  const handleMouseEnter = (categoryName) => {
+    clearTimeout(dropdownRef.current?.timeout);
+    setHoveredCategory(categoryName);
+  };
+
+  const handleMouseLeave = (categoryName) => {
+    dropdownRef.current.timeout = setTimeout(() => {
+      setHoveredCategory(null);
+    }, 200);
+  };
+
+  const handleSubcategoryClick = (category, subcategory) => {
+    let params = new URLSearchParams();
+    let metal = '';
+    let categoryFilter = '';
+
+    // Map subcategories to FilterModal options
+    if (category === 'Gold') {
+      metal = 'gold';
+      if (subcategory.includes('Chains')) categoryFilter = 'chain';
+      else if (subcategory.includes('Rings')) categoryFilter = 'ring';
+      else if (subcategory.includes('Necklaces')) categoryFilter = 'pendant';
+      else if (subcategory.includes('Bangles')) categoryFilter = 'bangle';
+    } else if (category === 'Silver') {
+      metal = 'silver';
+      if (subcategory.includes('Rings')) categoryFilter = 'ring';
+      else if (subcategory.includes('Necklaces')) categoryFilter = 'pendant';
+      else if (subcategory.includes('Earrings')) categoryFilter = 'stud';
+      else if (subcategory.includes('Bracelets')) categoryFilter = 'bracelet';
+    } else if (category === 'Rings') {
+      categoryFilter = 'ring'; // All ring types map to 'ring'
+    } else if (category === 'Earrings') {
+      categoryFilter = 'stud'; // All earring types map to 'stud'
+    } else if (category === 'Necklace Sets') {
+      categoryFilter = 'pendant'; // All necklace set types map to 'pendant'
+    } else if (category === 'Gold Coins') {
+      metal = 'gold';
+      categoryFilter = 'coin';
+    } else if (category === 'Collections') {
+      // Optional: Map to occasion if needed
+      if (subcategory.includes('Bridal')) params.set('occasion', 'wedding');
+      // Add more mappings as needed
+    }
+
+    if (metal) params.set('metal', metal);
+    if (categoryFilter) params.set('category', categoryFilter);
+
+    navigate(`/products?${params.toString()}`);
+    setHoveredCategory(null);
+  };
+
   return (
     <header className={`bg-gradient-to-b from-teal-900 to-teal-950 text-white shadow-lg sticky top-0 z-50 transition-transform duration-300 ${isNavbarVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
@@ -165,7 +216,6 @@ const Navbar = () => {
               <a href="/signup" className="text-base font-semibold hover:text-yellow-400 transition-all duration-200">Signup</a>
             </>
           )}
-
         </div>
 
         <div className="md:hidden">
@@ -177,15 +227,29 @@ const Navbar = () => {
 
       <nav className="hidden md:flex justify-center space-x-12 py-4 bg-teal-950 border-t border-teal-800 text-base font-semibold uppercase tracking-wide font-sans">
         {categories.map((category) => (
-          <div key={category.name} className="relative" onMouseEnter={() => setHoveredCategory(category.name)} onMouseLeave={() => setHoveredCategory(null)}>
+          <div
+            key={category.name}
+            className="relative"
+            onMouseEnter={() => handleMouseEnter(category.name)}
+            onMouseLeave={() => handleMouseLeave(category.name)}
+            ref={dropdownRef}
+          >
             <button className="flex items-center space-x-1 text-teal-100 hover:text-yellow-400 transition-all duration-200">
               <span>{category.name}</span>
               <ChevronDown className={`h-5 w-5 transform transition-transform duration-300 ${hoveredCategory === category.name ? 'rotate-180 text-yellow-400' : ''}`} />
             </button>
             {hoveredCategory === category.name && (
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white rounded-lg shadow-2xl border border-gray-100 z-50 min-w-[250px] py-4">
+              <div
+                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white rounded-lg shadow-2xl border border-gray-100 z-50 min-w-[250px] py-4"
+                onMouseEnter={() => handleMouseEnter(category.name)}
+                onMouseLeave={() => handleMouseLeave(category.name)}
+              >
                 {category.subcategories.map((sub) => (
-                  <button key={sub} className="block w-full px-6 py-2 text-left text-gray-800 hover:bg-teal-50 hover:text-teal-900 transition-all duration-200">
+                  <button
+                    key={sub}
+                    className="block w-full px-6 py-2 text-left text-gray-800 hover:bg-teal-50 hover:text-teal-900 transition-all duration-200"
+                    onClick={() => handleSubcategoryClick(category.name, sub)}
+                  >
                     {sub}
                   </button>
                 ))}
@@ -211,7 +275,7 @@ const Navbar = () => {
             <button
               onClick={() => {
                 navigate('/wishlist');
-                setMobileMenuOpen(false); // Optional: Close mobile menu after navigation
+                setMobileMenuOpen(false);
               }}
               className="w-full text-left flex items-center space-x-3 text-teal-100 hover:text-yellow-400 transition-all duration-200"
             >
@@ -246,7 +310,6 @@ const Navbar = () => {
                   <span className="text-sm">Logout</span>
                 </button>
               </div>
-
             ) : (
               <>
                 <a href="/login" className="block text-teal-100 hover:text-yellow-400 transition-all duration-200">Login</a>
@@ -267,7 +330,16 @@ const Navbar = () => {
                 {expandedCategory === cat.name && (
                   <div className="pl-6 text-teal-200">
                     {cat.subcategories.map((sub) => (
-                      <div key={sub} className="py-2 hover:text-white transition-all duration-200">{sub}</div>
+                      <div
+                        key={sub}
+                        className="py-2 hover:text-white transition-all duration-200"
+                        onClick={() => {
+                          handleSubcategoryClick(cat.name, sub);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        {sub}
+                      </div>
                     ))}
                   </div>
                 )}

@@ -6,7 +6,7 @@ const NewArrivals = () => {
       <h2 className="text-2xl font-light text-center mb-6 text-black tracking-widest">
         NEW ARRIVALS
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 justify-items-center gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 justify-items-center gap-4">
         {[
           {
             img: 'https://pcchandraindia.com/cdn/shop/files/22K134NP25770_1.webp?v=1731581524',
@@ -42,13 +42,13 @@ const NewArrivals = () => {
           <div
             key={index}
             className="bg-gray-100 rounded-lg text-center 
-                       w-[90%] sm:w-48 md:w-58 h-64 
+                       w-full max-w-xs h-auto 
                        flex flex-col justify-center items-center p-4"
           >
             <img
               src={item.img}
               alt={item.alt}
-              className="w-[60%] h-auto mb-4"
+              className="w-[60%] h-auto mb-4 object-contain"
             />
             <p className="text-sm text-gray-600 mb-2">{item.desc}</p>
             <p className="text-sm font-normal text-gray-900 underline underline-offset-2">

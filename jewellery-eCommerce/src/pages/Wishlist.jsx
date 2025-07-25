@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaHeart, FaTrash, FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Heart } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -30,7 +31,7 @@ export default function Wishlist({ user }) {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Get current user if not provided
         let currentUser = user;
         if (!currentUser) {
@@ -43,11 +44,11 @@ export default function Wishlist({ user }) {
         }
 
         console.log('Fetching wishlist for user ID:', currentUser._id); // Debug log
-        
+
         const response = await axios.get(`${API_BASE_URL}/wishlists/${currentUser._id}`, {
           withCredentials: true,
         });
-        
+
         console.log('Wishlist response:', response.data); // Debug log
         setWishlist(response.data.data);
         setLoading(false);
@@ -83,14 +84,14 @@ export default function Wishlist({ user }) {
       }
 
       console.log('Removing item:', productId, 'for user:', currentUser._id); // Debug log
-      
+
       const response = await axios.delete(
         `${API_BASE_URL}/wishlists/${currentUser._id}/${productId}`,
         {
           withCredentials: true,
         }
       );
-      
+
       setWishlist(response.data.data);
     } catch (err) {
       console.error('Error removing item:', err);
@@ -101,7 +102,7 @@ export default function Wishlist({ user }) {
   // Delete entire wishlist
   const handleDeleteWishlist = async () => {
     if (!window.confirm('Are you sure you want to delete your entire wishlist?')) return;
-    
+
     try {
       let currentUser = user;
       if (!currentUser) {
@@ -113,11 +114,11 @@ export default function Wishlist({ user }) {
       }
 
       console.log('Deleting wishlist for user:', currentUser._id); // Debug log
-      
+
       await axios.delete(`${API_BASE_URL}/wishlists/${currentUser._id}`, {
         withCredentials: true,
       });
-      
+
       setWishlist({ items: [] });
     } catch (err) {
       console.error('Error deleting wishlist:', err);
@@ -172,7 +173,6 @@ export default function Wishlist({ user }) {
       {/* Wishlist Content */}
       <div className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-semibold text-gray-800">Your Wishlist</h1>
           {wishlist?.items?.length > 0 && (
             <button
               onClick={handleDeleteWishlist}
@@ -230,9 +230,11 @@ export default function Wishlist({ user }) {
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">💔</div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">Your Wishlist is Empty</h3>
-            <p className="text-gray-600 mb-6">Start adding your favorite jewellery items to your wishlist!</p>
+            <div className="flex flex-col items-center text-center">
+              <Heart className="w-16 h-16 text-gray-400 mb-4" />
+              <h3 className="text-2xl font-semibold text-gray-800 mb-2">Your Wishlist is Empty</h3>
+              <p className="text-gray-600 mb-6">Start adding your favorite jewellery items to your wishlist!</p>
+            </div>
             <Link
               to="/products"
               className="inline-block px-6 py-3 bg-teal-700 text-white rounded-xl font-semibold hover:bg-teal-800 transition-all duration-300"

@@ -41,7 +41,7 @@ export default function ProductListing({ user }) {
         setLoading(true);
         const jewelleryResponse = await axios.get(`${API_BASE_URL}/jewellery`, { withCredentials: true });
         setJewelleryItems(jewelleryResponse.data.data);
-        setFilteredItems(jewelleryResponse.data.data);
+        setFilteredItems(jewelleryResponse.data.data); // Initialize with all items
         setLoading(false);
       } catch (err) {
         setError(`Failed to fetch data: ${err.response?.data?.message || err.message}`);
@@ -61,6 +61,7 @@ export default function ProductListing({ user }) {
       occasion: searchParams.get('occasion') || '',
       purity: searchParams.get('purity') || '',
     };
+    console.log('URL Filters applied:', newFilters); // Debug log
     setFilters(newFilters);
   }, [searchParams]);
 
@@ -68,21 +69,32 @@ export default function ProductListing({ user }) {
   useEffect(() => {
     let result = [...jewelleryItems];
 
+    console.log('Applying filters:', filters); // Debug log
     // Apply filters
     if (filters.category) {
-      result = result.filter((item) => item.category === filters.category);
+      result = result.filter((item) => 
+        item.category && item.category.toLowerCase() === filters.category.toLowerCase()
+      );
     }
     if (filters.metal) {
-      result = result.filter((item) => item.metal === filters.metal);
+      result = result.filter((item) => 
+        item.metal && item.metal.toLowerCase() === filters.metal.toLowerCase()
+      );
     }
     if (filters.gender) {
-      result = result.filter((item) => item.gender === filters.gender);
+      result = result.filter((item) => 
+        item.gender && item.gender.toLowerCase() === filters.gender.toLowerCase()
+      );
     }
     if (filters.occasion) {
-      result = result.filter((item) => item.occasion === filters.occasion);
+      result = result.filter((item) => 
+        item.occasion && item.occasion.toLowerCase() === filters.occasion.toLowerCase()
+      );
     }
     if (filters.purity) {
-      result = result.filter((item) => item.purity === filters.purity);
+      result = result.filter((item) => 
+        item.purity && item.purity.toLowerCase() === filters.purity.toLowerCase()
+      );
     }
 
     // Apply sorting
@@ -94,6 +106,7 @@ export default function ProductListing({ user }) {
       result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     }
 
+    console.log('Filtered items count:', result.length); // Debug log
     setFilteredItems(result);
   }, [filters, sortBy, jewelleryItems]);
 
