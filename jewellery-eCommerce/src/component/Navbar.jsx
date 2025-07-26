@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { MapPin, Heart, ChevronDown, Menu, X, User, Package, LogOut } from 'lucide-react';
+import { MapPin, Heart, ChevronDown, Menu, X, User, Package } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -75,24 +75,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [prevScrollPos]);
 
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${API_BASE_URL}/auth/logout`, { withCredentials: true });
-      localStorage.removeItem('user');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('isLoggedIn');
-      setUser(null);
-      setUserRole(null);
-      window.location.href = '/';
-    } catch (err) {
-      console.error('Logout failed:', err);
-      localStorage.removeItem('user');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('isLoggedIn');
-      setUser(null);
-      setUserRole(null);
-    }
-  };
 
   const handleProfileClick = () => {
     if (user && userRole) {
@@ -157,8 +139,8 @@ const Navbar = () => {
   };
 
   return (
-    <header className={`bg-gradient-to-b from-teal-900 to-teal-950 text-white shadow-lg sticky top-0 z-50 transition-transform duration-300 ${isNavbarVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
+    <header className={`bg-gradient-to-b from-teal-900 to-teal-950 text-white shadow-lg sticky top-0 z-[9999] transition-transform duration-300 ${isNavbarVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-5 flex items-center justify-between relative z-[10000]">
         <div className="flex items-center space-x-4">
           <Link to="/" className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
@@ -205,10 +187,7 @@ const Navbar = () => {
                   </span>
                 )}
               </button>
-              <button onClick={handleLogout} className="text-base font-semibold hover:text-yellow-400 transition-all duration-200">
-                <LogOut className="h-6 w-6 inline-block m-2" />
-                Logout
-              </button>
+              
             </>
           ) : (
             <>
@@ -225,7 +204,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <nav className="hidden md:flex justify-center space-x-12 py-4 bg-teal-950 border-t border-teal-800 text-base font-semibold uppercase tracking-wide font-sans">
+      <nav className="hidden md:flex justify-center space-x-12 py-4 bg-teal-950 border-t border-teal-800 text-base font-semibold uppercase tracking-wide font-sans relative z-[10000]">
         {categories.map((category) => (
           <div
             key={category.name}
@@ -240,7 +219,7 @@ const Navbar = () => {
             </button>
             {hoveredCategory === category.name && (
               <div
-                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white rounded-lg shadow-2xl border border-gray-100 z-50 min-w-[250px] py-4"
+                className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white rounded-lg shadow-2xl border border-gray-100 z-[10001] min-w-[250px] py-4"
                 onMouseEnter={() => handleMouseEnter(category.name)}
                 onMouseLeave={() => handleMouseLeave(category.name)}
               >
@@ -260,7 +239,7 @@ const Navbar = () => {
       </nav>
 
       {mobileMenuOpen && (
-        <div className="md:hidden px-6 pb-6 bg-teal-950 border-t border-teal-800 text-base font-medium">
+        <div className="md:hidden px-6 pb-6 bg-teal-950 border-t border-teal-800 text-base font-medium relative z-[10000]">
           <div className="py-4 space-y-4">
             <button
               onClick={() => {
@@ -302,13 +281,7 @@ const Navbar = () => {
                   )}
                 </button>
 
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-1 text-teal-100 hover:text-yellow-400 transition-all duration-200"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span className="text-sm">Logout</span>
-                </button>
+               
               </div>
             ) : (
               <>
@@ -332,7 +305,7 @@ const Navbar = () => {
                     {cat.subcategories.map((sub) => (
                       <div
                         key={sub}
-                        className="py-2 hover:text-white transition-all duration-200"
+                        className="py-2 hover:text-white transition-all duration-200 cursor-pointer"
                         onClick={() => {
                           handleSubcategoryClick(cat.name, sub);
                           setMobileMenuOpen(false);

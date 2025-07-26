@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-// const { v4: uuidv4 } = require("uuid");
 const slugify = require("slugify");
 const Jewellery = require("../models/jewelleryModel");
 const AppError = require("../utils/appArror");
@@ -67,12 +66,13 @@ const createJewellery = async (req, res, next) => {
       images,
       customizable,
       materialDescription,
+      newArrival
     } = req.body;
 
     const productSlug = slugify(prodname, { lower: true, strict: true });
 
-    // Create the product instance and save it to generate _id
-    const newJewellery = new Jewellery({
+    // Normalize customizable and newArrival
+    const normalizedData = {
       prodname,
       category,
       description,
@@ -83,10 +83,14 @@ const createJewellery = async (req, res, next) => {
       occasion,
       purity,
       filterLists,
-      customizable,
+      customizable: customizable === 'yes' || customizable === true ? 'yes' : 'no',
       materialDescription,
-      images: [],
-    });
+      newArrival: newArrival === 'yes' || newArrival === true ? 'yes' : 'no',
+      images: []
+    };
+
+    // Create the product instance and save it to generate _id
+    const newJewellery = new Jewellery(normalizedData);
 
     await newJewellery.save();
     const productId = newJewellery._id.toString();
@@ -138,22 +142,47 @@ const createJewellery = async (req, res, next) => {
 // Update a jewellery item by ID
 const updateJewellery = async (req, res, next) => {
   try {
-    const jewellery = await Jewellery.findByIdAndUpdate(
-      req.params.jewelleryId,
-      req.body,
+    const jewelleryId = req.params.jewelleryId;
+    const updateData = req.body;
+
+    console.log('Received PATCH data:', updateData); // Debug log
+
+    // Normalize customizable and newArrival to strings
+    if (updateData.customizable !== undefined) {
+      updateData.customizable = updateData.customizable === 'yes' || updateData.customizable === true ? 'yes' : 'no';
+    }
+    if (updateData.newArrival !== undefined) {
+      updateData.newArrival = updateData.newArrival === 'yes' || updateData.newArrival === true ? 'yes' : 'no';
+    }
+
+    // Update filterLists based on newArrival
+    if (updateData.newArrival === 'yes' && !updateData.filterLists.includes('new arrivals')) {
+      updateData.filterLists = [...updateData.filterLists, 'new arrivals'];
+    } else if (updateData.newArrival === 'no') {
+      updateData.filterLists = updateData.filterLists.filter(item => item !== 'new arrivals');
+    }
+
+    console.log('Processed PATCH data:', updateData); // Debug log
+
+    const updatedJewellery = await Jewellery.findByIdAndUpdate(
+      jewelleryId,
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 
-    if (!jewellery) {
+    if (!updatedJewellery) {
       return next(new AppError("No jewellery item found with that ID", 404));
     }
+
+    console.log('Updated jewellery:', updatedJewellery); // Debug log
 
     res.status(200).json({
       status: "success",
       message: "Jewellery item updated successfully",
-      data: jewellery,
+      data: updatedJewellery,
     });
   } catch (err) {
+    console.error('PATCH error:', err);
     next(err);
   }
 };

@@ -1,14 +1,29 @@
 import { FaHeart } from 'react-icons/fa';
 
 export default function ProductDetails({ product, isLiked, toggleLike }) {
+    console.log('ProductDetails product prop:', product); // Debug log to inspect product data
+
+    const normalizeBooleanField = (value) => {
+      if (value === 'yes' || value === true) return 'Yes';
+      if (value === 'no' || value === false) return 'No';
+      return 'Not specified';
+    };
+
     return (
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-semibold text-gray-800 mb-3">{product.prodname}</h1>
-                <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 text-sm font-medium rounded-full capitalize">
-                    {product.category}
-                </span>
+                <h1 className="text-3xl font-semibold text-gray-800 mb-3">{product.prodname || 'Unnamed Product'}</h1>
+                <div className="flex items-center gap-2">
+                    <span className="inline-block px-3 py-1 bg-teal-100 text-teal-700 text-sm font-medium rounded-full capitalize">
+                        {product.category || 'No Category'}
+                    </span>
+                    {product.filterLists?.includes('new arrivals') && (
+                        <span className="inline-block px-3 py-1 bg-yellow-500 text-white text-sm font-medium rounded-full">
+                            New Arrival
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Product Info */}
@@ -17,19 +32,25 @@ export default function ProductDetails({ product, isLiked, toggleLike }) {
                 <div className="space-y-3">
                     <div className="flex justify-between">
                         <span className="text-gray-600 text-sm font-medium">Metal:</span>
-                        <span className="text-gray-800 font-semibold capitalize">{product.metal}</span>
+                        <span className="text-gray-800 font-semibold capitalize">{product.metal || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-600 text-sm font-medium">For:</span>
-                        <span className="text-gray-800 font-semibold capitalize">{product.gender}</span>
+                        <span className="text-gray-800 font-semibold capitalize">{product.gender || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-600 text-sm font-medium">Occasion:</span>
-                        <span className="text-gray-800 font-semibold capitalize">{product.occasion}</span>
+                        <span className="text-gray-800 font-semibold capitalize">{product.occasion || 'Not specified'}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-600 text-sm font-medium">Purity:</span>
-                        <span className="text-gray-800 font-semibold capitalize">{product.purity}</span>
+                        <span className="text-gray-800 font-semibold capitalize">{product.purity || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm font-medium">Customizable:</span>
+                        <span className="text-gray-800 font-semibold capitalize">
+                            {normalizeBooleanField(product.customizable)}
+                        </span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-gray-600 text-sm font-medium">Description:</span>

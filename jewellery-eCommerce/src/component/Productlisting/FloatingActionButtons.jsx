@@ -11,7 +11,7 @@ export default function FloatingActionButtons({ setIsFilterModalOpen, setIsSortM
           <FaFilter />
           Filter
         </button>
-        <div className="w-px h-12 bg-gray-200"></div>
+        <div className="w-px h-12 bg-white"></div>
         <button
           onClick={() => setIsSortModalOpen(true)}
           className="px-6 py-4 text-gray-700 hover:bg-gray-50 transition-all duration-300 flex items-center gap-2 font-semibold"

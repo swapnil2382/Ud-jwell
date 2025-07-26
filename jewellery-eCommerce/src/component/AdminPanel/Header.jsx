@@ -1,6 +1,6 @@
-import { MoreVertical, X, User, Package, Users, Settings, Plus } from 'lucide-react';
+import { MoreVertical, X, User, Package, Users, Plus } from 'lucide-react';
 
-export default function Header({ user, activeSection, setActiveSection, isMenuOpen, setIsMenuOpen }) {
+export default function Header({ activeSection, setActiveSection, isMenuOpen, setIsMenuOpen }) {
   const navigationItems = [
     { key: 'profile', label: 'Profile', icon: User },
     { key: 'add', label: 'Add Product', icon: Plus },
@@ -13,68 +13,57 @@ export default function Header({ user, activeSection, setActiveSection, isMenuOp
   };
 
   return (
-    <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-              <Settings className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">Admin Dashboard</h1>
-              <p className="text-sm text-slate-600">Welcome back, {user?.fullname || 'Admin'}</p>
-            </div>
-          </div>
+    <div className="flex items-center justify-end p-4 relative">
+      {/* Desktop Navigation */}
+      <nav className="hidden sm:flex space-x-2">
+        {navigationItems.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setActiveSection(key)}
+            className={`flex items-center space-x-2 px-3 py-2 rounded-xl font-medium transition-all duration-200 text-sm ${
+              activeSection === key
+                ? 'bg-teal-700 text-white shadow-lg shadow-teal-700/25'
+                : 'text-teal-700 hover:bg-teal-50 hover:text-teal-800'
+            }`}
+          >
+            <Icon size={16} />
+            <span className="hidden md:inline">{label}</span>
+          </button>
+        ))}
+      </nav>
 
-          <nav className="hidden lg:flex space-x-1">
+      {/* Mobile Menu Toggle */}
+      <button 
+        className="sm:hidden p-3 rounded-xl hover:bg-teal-50 transition-colors text-teal-700 bg-white shadow-md"
+        onClick={toggleMenu}
+      >
+        {isMenuOpen ? <X size={20} /> : <MoreVertical size={20} />}
+      </button>
+
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="sm:hidden absolute top-20 right-4 w-56 bg-white rounded-xl shadow-xl z-50">
+          <nav className="p-3 space-y-1">
             {navigationItems.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
-                onClick={() => setActiveSection(key)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                onClick={() => {
+                  setActiveSection(key);
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg font-medium transition-all duration-200 text-sm ${
                   activeSection === key
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-teal-700 text-white shadow-lg shadow-teal-700/25'
+                    : 'text-teal-700 hover:bg-teal-50'
                 }`}
               >
-                <Icon size={18} />
+                <Icon size={16} />
                 <span>{label}</span>
               </button>
             ))}
           </nav>
-
-          <button 
-            className="lg:hidden p-2 rounded-xl hover:bg-slate-100 transition-colors"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? <X size={24} /> : <MoreVertical size={24} />}
-          </button>
         </div>
-
-        {isMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 py-4">
-            <nav className="space-y-2">
-              {navigationItems.map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveSection(key);
-                    setIsMenuOpen(false);
-                  }}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                    activeSection === key
-                      ? 'bg-blue-600 text-white'
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span>{label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        )}
-      </div>
-    </header>
+      )}
+    </div>
   );
 }

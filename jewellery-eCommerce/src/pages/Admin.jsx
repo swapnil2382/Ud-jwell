@@ -24,6 +24,7 @@ const initialState = {
   images: [],
   customizable: "",
   materialDescription: "",
+  newArrival: "",
 };
 
 const Admin = ({ user }) => {
@@ -73,6 +74,13 @@ const Admin = ({ user }) => {
   ];
   const metalColourOptions = ["yellow", "white", "rose"];
 
+  // Normalize boolean fields to strings
+  const normalizeProductData = (product) => ({
+    ...product,
+    customizable: product.customizable === true ? 'yes' : product.customizable === false ? 'no' : product.customizable || 'no',
+    newArrival: product.newArrival === true ? 'yes' : product.newArrival === false ? 'no' : product.newArrival || 'no',
+  });
+
   // Clear messages after 5 seconds
   useEffect(() => {
     if (success || error) {
@@ -94,8 +102,9 @@ const Admin = ({ user }) => {
         });
         const data = await response.json();
         if (data.status !== "success") throw new Error(data.message || "Failed to fetch products");
-        setProducts(data.data || []);
-        setFilteredProducts(data.data || []);
+        const normalizedProducts = data.data.map(normalizeProductData);
+        setProducts(normalizedProducts || []);
+        setFilteredProducts(normalizedProducts || []);
       } catch (err) {
         setError(err.message || "Failed to fetch products.");
       } finally {
@@ -189,6 +198,7 @@ const Admin = ({ user }) => {
           formData.category,
           formData.purity,
           formData.metalColour,
+          formData.newArrival === "yes" ? "new arrivals" : null,
         ].filter(Boolean),
       };
 
@@ -206,7 +216,8 @@ const Admin = ({ user }) => {
       const data = response.data;
       if (data.status !== "success") throw new Error(data.message || "Failed to add product");
 
-      setProducts([...products, data.data]);
+      const normalizedProduct = normalizeProductData(data.data);
+      setProducts([...products, normalizedProduct]);
       setSuccess("Product added successfully!");
       setError(null);
       setFormData(initialState);
@@ -263,8 +274,9 @@ const Admin = ({ user }) => {
       const data = response.data;
       if (data.status !== "success") throw new Error(data.message || "Failed to update product");
 
+      const normalizedProduct = normalizeProductData(data.data);
       setProducts(products.map((product) =>
-        product._id === jewelleryId ? data.data : product
+        product._id === jewelleryId ? normalizedProduct : product
       ));
       setSuccess("Product updated successfully!");
       setError(null);
@@ -439,25 +451,24 @@ const Admin = ({ user }) => {
             metalColourOptions={metalColourOptions}
           />
         )}
-
-{activeSection === "manage" && (
-  <ManageProductsSection
-    filteredProducts={filteredProducts}
-    loading={loading}
-    searchTerm={searchTerm}
-    setSearchTerm={setSearchTerm}
-    filterCategory={filterCategory}
-    setFilterCategory={setFilterCategory}
-    handleDeleteProduct={handleDeleteProduct}
-    handleEditProduct={handleEditProduct}
-    categoryOptions={categoryOptions}
-    metalOptions={metalOptions}
-    genderOptions={genderOptions}
-    occasionOptions={occasionOptions}
-    purityOptions={purityOptions}
-    metalColourOptions={metalColourOptions}
-  />
-)}
+        {activeSection === "manage" && (
+          <ManageProductsSection
+            filteredProducts={filteredProducts}
+            loading={loading}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
+            handleDeleteProduct={handleDeleteProduct}
+            handleEditProduct={handleEditProduct}
+            categoryOptions={categoryOptions}
+            metalOptions={metalOptions}
+            genderOptions={genderOptions}
+            occasionOptions={occasionOptions}
+            purityOptions={purityOptions}
+            metalColourOptions={metalColourOptions}
+          />
+        )}
         {activeSection === "customers" && (
           <ManageCustomersSection
             filteredCustomers={filteredCustomers}

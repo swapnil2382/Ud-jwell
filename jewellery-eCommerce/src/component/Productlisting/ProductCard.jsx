@@ -49,6 +49,11 @@ export default function ProductCard({ item, index, user, wishlistItems, setWishl
         <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium ${item.available ? 'bg-teal-700 text-white' : 'bg-red-500 text-white'}`}>
           {item.available ? 'In Stock' : 'Out of Stock'}
         </div>
+        {item.filterLists?.includes('new arrivals') && (
+          <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-yellow-500 text-white">
+            New Arrival
+          </div>
+        )}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
           <Link
             to={`/product/${item._id}`}
