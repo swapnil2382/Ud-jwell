@@ -11,6 +11,7 @@ const userRouter = require("./routes/userRoutes");
 const jewelleryRouter = require("./routes/jewelleryRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const wishlistRouter = require("./routes/wishlistRoutes");
+const newArrivalRouter = require("./routes/newArrivalRoutes");
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/jewellery", jewelleryRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/wishlists", wishlistRouter);
+app.use("/api/v1/new-arrivals", newArrivalRouter);
 
 // CUSTOM ERROR MESSAGE FOR UNHANDLED ROUTES
 app.all("*", (req, res, next) => {

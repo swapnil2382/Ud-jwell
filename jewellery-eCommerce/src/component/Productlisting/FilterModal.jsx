@@ -19,11 +19,31 @@ export default function FilterModal({ isFilterModalOpen, setIsFilterModalOpen, f
         </div>
         <div className="p-6 space-y-6">
           {[
-            { name: 'category', label: 'Category', options: ['ring', 'chain', 'stud', 'bangle', 'bracelet', 'coin', 'pendant'] },
-            { name: 'metal', label: 'Metal', options: ['gold', 'silver'] },
-            { name: 'gender', label: 'Gender', options: ['men', 'women', 'kids', 'unisex'] },
-            { name: 'occasion', label: 'Occasion', options: ['casual', 'engagement', 'wedding'] },
-            { name: 'purity', label: 'Purity', options: ['24K', '22K', '18K', '14K', '10K', '925 (Silver)', '999 (Silver)'] }
+            {
+              name: 'category',
+              label: 'Category',
+              options: ['ring', 'chain', 'stud', 'bangle', 'bracelet', 'coin', 'pendant'],
+            },
+            {
+              name: 'metal',
+              label: 'Metal',
+              options: ['gold', 'silver'],
+            },
+            {
+              name: 'gender',
+              label: 'Gender',
+              options: ['men', 'women', 'kids', 'unisex'],
+            },
+            {
+              name: 'occasion',
+              label: 'Occasion',
+              options: ['casual', 'engagement', 'wedding'],
+            },
+            {
+              name: 'purity',
+              label: 'Purity',
+              options: ['24k', '22k', '18k', '14k', '10k', '925', '999'],
+            },
           ].map((filter) => (
             <div key={filter.name}>
               <label className="block text-sm font-semibold text-gray-700 mb-2">{filter.label}</label>
@@ -36,8 +56,10 @@ export default function FilterModal({ isFilterModalOpen, setIsFilterModalOpen, f
                 >
                   <option value="">All {filter.label}s</option>
                   {filter.options.map((option) => (
-                    <option key={option} value={option.toLowerCase().replace(/[^a-z0-9]/g, '')}>
-                      {option}
+                    <option key={option} value={option}>
+                      {filter.name === 'purity'
+                        ? option.toUpperCase()
+                        : option.charAt(0).toUpperCase() + option.slice(1)}
                     </option>
                   ))}
                 </select>

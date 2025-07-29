@@ -1,4 +1,4 @@
-import { MoreVertical, X, User, Package, Users, Plus } from 'lucide-react';
+import { MoreVertical, X, User, Package, Users, Plus, Star } from 'lucide-react';
 
 export default function Header({ activeSection, setActiveSection, isMenuOpen, setIsMenuOpen }) {
   const navigationItems = [
@@ -6,6 +6,7 @@ export default function Header({ activeSection, setActiveSection, isMenuOpen, se
     { key: 'add', label: 'Add Product', icon: Plus },
     { key: 'manage', label: 'Manage Products', icon: Package },
     { key: 'customers', label: 'Manage Customers', icon: Users },
+    { key: 'new-arrivals', label: 'Manage New Arrivals', icon: Star },
   ];
 
   const toggleMenu = () => {

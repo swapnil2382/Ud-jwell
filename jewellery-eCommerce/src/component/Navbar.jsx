@@ -17,13 +17,11 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
 
   const categories = [
-    { name: "Gold", subcategories: ["Gold Chains", "Gold Rings", "Gold Necklaces", "Gold Bangles"] },
-    { name: "Silver", subcategories: ["Silver Rings", "Silver Necklaces", "Silver Earrings", "Silver Bracelets"] },
-    { name: "Rings", subcategories: ["Engagement Rings", "Wedding Bands", "Fashion Rings", "Stackable Rings"] },
-    { name: "Earrings", subcategories: ["Stud Earrings", "Hoop Earrings", "Drop Earrings", "Chandelier Earrings"] },
-    { name: "Necklace Sets", subcategories: ["Pendant Sets", "Choker Sets", "Long Necklace Sets", "Bridal Sets"] },
-    { name: "Gold Coins", subcategories: ["24K Coins", "22K Coins", "Commemorative Coins", "Investment Coins"] },
-    { name: "Collections", subcategories: ["Bridal Collection", "Festive Collection", "Classic Collection", "Modern Collection"] },
+    { name: "Gold", subcategories: ["Gold Chains", "Gold Rings", "Gold Bracelets", "Gold Bangles", "Gold Pendant"] },
+    { name: "Silver", subcategories: ["Silver Rings", "Silver Pendant", "Silver Earrings", "Silver Bracelets"] },
+    { name: "Collections", subcategories: ["Wedding", "Engagement", "Casual"] },
+    { name: "Gold Coins", subcategories: ["24K Coins", "22K Coins", "18K Coins", "14K Coins", "10K Coins"] },
+    { name: "Shop by Gender", subcategories: ["Men", "Women", "Kids", "Unisex"] },
   ];
 
   const fetchUser = async () => {
@@ -75,7 +73,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [prevScrollPos]);
 
-
   const handleProfileClick = () => {
     if (user && userRole) {
       console.log('User role from localStorage:', userRole);
@@ -102,40 +99,46 @@ const Navbar = () => {
     let params = new URLSearchParams();
     let metal = '';
     let categoryFilter = '';
+    let gender = '';
+    let purity = '';
 
-    // Map subcategories to FilterModal options
     if (category === 'Gold') {
       metal = 'gold';
       if (subcategory.includes('Chains')) categoryFilter = 'chain';
       else if (subcategory.includes('Rings')) categoryFilter = 'ring';
-      else if (subcategory.includes('Necklaces')) categoryFilter = 'pendant';
+      else if (subcategory.includes('Bracelets')) categoryFilter = 'bracelet';
       else if (subcategory.includes('Bangles')) categoryFilter = 'bangle';
+      else if (subcategory.includes('Pendant')) categoryFilter = 'pendant';
     } else if (category === 'Silver') {
       metal = 'silver';
       if (subcategory.includes('Rings')) categoryFilter = 'ring';
-      else if (subcategory.includes('Necklaces')) categoryFilter = 'pendant';
+      else if (subcategory.includes('Pendant')) categoryFilter = 'pendant';
       else if (subcategory.includes('Earrings')) categoryFilter = 'stud';
       else if (subcategory.includes('Bracelets')) categoryFilter = 'bracelet';
-    } else if (category === 'Rings') {
-      categoryFilter = 'ring'; // All ring types map to 'ring'
-    } else if (category === 'Earrings') {
-      categoryFilter = 'stud'; // All earring types map to 'stud'
-    } else if (category === 'Necklace Sets') {
-      categoryFilter = 'pendant'; // All necklace set types map to 'pendant'
+    } else if (category === 'Collections') {
+      if (subcategory === 'Wedding') params.set('occasion', 'wedding');
+      else if (subcategory === 'Engagement') params.set('occasion', 'engagement');
+      else if (subcategory === 'Casual') params.set('occasion', 'casual');
     } else if (category === 'Gold Coins') {
       metal = 'gold';
       categoryFilter = 'coin';
-    } else if (category === 'Collections') {
-      // Optional: Map to occasion if needed
-      if (subcategory.includes('Bridal')) params.set('occasion', 'wedding');
-      // Add more mappings as needed
+      if (subcategory.includes('24K')) purity = '24k';
+      else if (subcategory.includes('22K')) purity = '22k';
+      else if (subcategory.includes('18K')) purity = '18k';
+      else if (subcategory.includes('14K')) purity = '14k';
+      else if (subcategory.includes('10K')) purity = '10k';
+    } else if (category === 'Shop by Gender') {
+      gender = subcategory.toLowerCase();
     }
 
     if (metal) params.set('metal', metal);
     if (categoryFilter) params.set('category', categoryFilter);
+    if (gender) params.set('gender', gender);
+    if (purity) params.set('purity', purity);
 
     navigate(`/products?${params.toString()}`);
     setHoveredCategory(null);
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -174,21 +177,18 @@ const Navbar = () => {
           </button>
 
           {user ? (
-            <>
-              <button
-                onClick={handleProfileClick}
-                className="flex items-center space-x-2 hover:text-yellow-400 transition-all duration-200"
-              >
-                <User className="w-6 h-6" />
-                <span className="text-base font-semibold">{user.fullname}</span>
-                {userRole && (
-                  <span className="text-xs bg-yellow-600 px-2 py-1 rounded-full">
-                    {userRole}
-                  </span>
-                )}
-              </button>
-              
-            </>
+            <button
+              onClick={handleProfileClick}
+              className="flex items-center space-x-2 hover:text-yellow-400 transition-all duration-200"
+            >
+              <User className="w-6 h-6" />
+              <span className="text-base font-semibold">{user.fullname}</span>
+              {userRole && (
+                <span className="text-xs bg-yellow-600 px-2 py-1 rounded-full">
+                  {userRole}
+                </span>
+              )}
+            </button>
           ) : (
             <>
               <a href="/login" className="text-base font-semibold hover:text-yellow-400 transition-all duration-200">Login</a>
@@ -269,7 +269,10 @@ const Navbar = () => {
             {user ? (
               <div className="flex justify-between items-center w-full">
                 <button
-                  onClick={handleProfileClick}
+                  onClick={() => {
+                    handleProfileClick();
+                    setMobileMenuOpen(false);
+                  }}
                   className="flex items-center gap-1 text-teal-100 hover:text-yellow-400 transition-all duration-200"
                 >
                   <User className="w-5 h-5" />
@@ -280,8 +283,6 @@ const Navbar = () => {
                     </span>
                   )}
                 </button>
-
-               
               </div>
             ) : (
               <>

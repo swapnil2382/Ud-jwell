@@ -490,7 +490,7 @@ function Profile({ user, setUser }) {
                           </div>
                           <Link
                             to={`/product/${item._id}`}
-                            className="block w-full text-center py-2.5 px-4 bg-gradient-to-r from-teal-600 to-blue-600 text-white rounded-lg hover:from-teal-700 hover:to-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                            className="block w-full text-center py-2.5 px-4 bg-gradient-to-r from-teal-600 to-teal-600 text-white rounded-lg hover:from-teal-700 hover:to-teal-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
                           >
                             View Details
                           </Link>

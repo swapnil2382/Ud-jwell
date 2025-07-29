@@ -7,6 +7,8 @@ import ProfileSection from "../component/AdminPanel/ProfileSection";
 import AddProductSection from "../component/AdminPanel/AddProductSection";
 import ManageProductsSection from "../component/AdminPanel/ManageProductsSection";
 import ManageCustomersSection from "../component/AdminPanel/ManageCustomersSection";
+import ManageNewArrivalsSection from "../component/AdminPanel/ManageNewArrivalsSection";
+import NewArrivalModal from "../component/AdminPanel/NewArrivalModal";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -27,11 +29,20 @@ const initialState = {
   newArrival: "",
 };
 
+const initialNewArrivalState = {
+  imageUrl: "",
+  altText: "",
+  description: "",
+  title: "",
+};
+
 const Admin = ({ user }) => {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [filteredNewArrivals, setFilteredNewArrivals] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [formData, setFormData] = useState(initialState);
@@ -42,11 +53,14 @@ const Admin = ({ user }) => {
     phone: "",
     role: "",
   });
+  const [newArrivalFormData, setNewArrivalFormData] = useState(initialNewArrivalState);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [activeSection, setActiveSection] = useState("profile");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+  const [isNewArrivalModalOpen, setIsNewArrivalModalOpen] = useState(false);
+  const [isEditingNewArrival, setIsEditingNewArrival] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Dropdown options based on Mongoose schema
@@ -135,11 +149,31 @@ const Admin = ({ user }) => {
     fetchCustomers();
   }, []);
 
+  // Fetch all new arrivals on component mount
+  useEffect(() => {
+    const fetchNewArrivals = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/new-arrivals`, {
+          withCredentials: true,
+        });
+        if (response.data.status !== "success") throw new Error(response.data.message || "Failed to fetch new arrivals");
+        setNewArrivals(response.data.data.newArrivals || []);
+        setFilteredNewArrivals(response.data.data.newArrivals || []);
+      } catch (err) {
+        setError(err.message || "Failed to fetch new arrivals.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNewArrivals();
+  }, []);
+
   // Filter products based on search and category
   useEffect(() => {
     let filtered = products;
 
-    if (searchTerm) {
+    if (searchTerm && activeSection === "manage") {
       filtered = filtered.filter(
         (product) =>
           product.prodname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -154,7 +188,7 @@ const Admin = ({ user }) => {
     }
 
     setFilteredProducts(filtered);
-  }, [products, searchTerm, filterCategory]);
+  }, [products, searchTerm, filterCategory, activeSection]);
 
   // Filter customers based on search
   useEffect(() => {
@@ -171,6 +205,21 @@ const Admin = ({ user }) => {
     setFilteredCustomers(filtered);
   }, [customers, searchTerm, activeSection]);
 
+  // Filter new arrivals based on search
+  useEffect(() => {
+    let filtered = newArrivals;
+
+    if (searchTerm && activeSection === "new-arrivals") {
+      filtered = filtered.filter(
+        (arrival) =>
+          arrival.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          arrival.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    setFilteredNewArrivals(filtered);
+  }, [newArrivals, searchTerm, activeSection]);
+
   // Handle product form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -181,6 +230,110 @@ const Admin = ({ user }) => {
   const handleCustomerInputChange = (e) => {
     const { name, value } = e.target;
     setCustomerFormData({ ...customerFormData, [name]: value });
+  };
+
+  // Handle new arrival addition
+  const handleAddNewArrival = async (formData) => {
+    if (newArrivals.length >= 5) {
+      setError("Cannot add new arrival: Maximum of 5 new arrivals allowed.");
+      setSuccess(null);
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${API_BASE_URL}/new-arrivals`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.status !== "success") throw new Error(response.data.message || "Failed to add new arrival");
+
+      setNewArrivals([...newArrivals, response.data.data.newArrival]);
+      setSuccess("New arrival added successfully!");
+      setError(null);
+      setNewArrivalFormData(initialNewArrivalState);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "Failed to add new arrival."
+      );
+      setSuccess(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle new arrival editing
+  const handleEditNewArrival = async (formData) => {
+    try {
+      setLoading(true);
+      const response = await axios.patch(
+        `${API_BASE_URL}/new-arrivals/${formData._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.status !== "success") throw new Error(response.data.message || "Failed to update new arrival");
+
+      setNewArrivals(newArrivals.map((arrival) =>
+        arrival._id === formData._id ? response.data.data.newArrival : arrival
+      ));
+      setSuccess("New arrival updated successfully!");
+      setError(null);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "Failed to update new arrival."
+      );
+      setSuccess(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle new arrival deletion
+  const handleDeleteNewArrival = async (id) => {
+    if (newArrivals.length <= 5) {
+      setError("Cannot delete new arrival: Minimum of 5 new arrivals required.");
+      setSuccess(null);
+      return;
+    }
+    if (!window.confirm("Are you sure you want to delete this new arrival?"))
+      return;
+
+    try {
+      setLoading(true);
+      const response = await axios.delete(`${API_BASE_URL}/new-arrivals/${id}`, {
+        withCredentials: true,
+      });
+
+      if (response.data.status !== "success") throw new Error(response.data.message || "Failed to delete new arrival");
+
+      setNewArrivals(newArrivals.filter((arrival) => arrival._id !== id));
+      setSuccess("New arrival deleted successfully!");
+      setError(null);
+    } catch (err) {
+      setError(err.message || "Failed to delete new arrival.");
+      setSuccess(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Start editing new arrival
+  const startEditingNewArrival = (arrival) => {
+    setNewArrivalFormData(arrival);
+    setIsEditingNewArrival(true);
+    setIsNewArrivalModalOpen(true);
   };
 
   // Handle form submission to add a new product
@@ -375,7 +528,8 @@ const Admin = ({ user }) => {
     setIsEditingCustomer(true);
   };
 
-  function handleImageChange(e) {
+  // Handle image change for products
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
@@ -398,7 +552,7 @@ const Admin = ({ user }) => {
       .catch((err) => {
         console.error("Error reading image files:", err);
       });
-  }
+  };
 
   if (!user) {
     return (
@@ -434,6 +588,7 @@ const Admin = ({ user }) => {
             user={user}
             products={products}
             customers={customers}
+            newArrivals={newArrivals}
           />
         )}
         {activeSection === "add" && (
@@ -485,7 +640,36 @@ const Admin = ({ user }) => {
             setCustomerFormData={setCustomerFormData}
           />
         )}
+        {activeSection === "new-arrivals" && (
+          <div>
+            {newArrivals.length < 5 && (
+              <button
+                onClick={() => {
+                  setNewArrivalFormData(initialNewArrivalState);
+                  setIsEditingNewArrival(false);
+                  setIsNewArrivalModalOpen(true);
+                }}
+                className="mb-6 px-6 py-3 bg-teal-700 text-white rounded-xl font-semibold hover:bg-teal-800 transition-all duration-300 shadow-sm"
+              >
+                Add New Arrival
+              </button>
+            )}
+            <ManageNewArrivalsSection
+              filteredNewArrivals={filteredNewArrivals}
+              loading={loading}
+              handleDeleteNewArrival={handleDeleteNewArrival}
+              startEditingNewArrival={startEditingNewArrival}
+              newArrivalsCount={newArrivals.length}
+            />
+          </div>
+        )}
       </main>
+      <NewArrivalModal
+        isOpen={isNewArrivalModalOpen}
+        onClose={() => setIsNewArrivalModalOpen(false)}
+        onSubmit={isEditingNewArrival ? handleEditNewArrival : handleAddNewArrival}
+        initialData={newArrivalFormData}
+      />
     </div>
   );
 };
